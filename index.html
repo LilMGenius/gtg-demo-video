@@ -6,32 +6,24 @@
 <style>
 html,body{margin:0;height:100%;background:#000;overflow:hidden}
 video{position:fixed;inset:0;width:100%;height:100%;object-fit:contain;background:#000}
-#snd{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:2;display:none;
-  padding:18px 30px;border:0;border-radius:999px;background:#f2b431;color:#1b1b1b;
-  font:700 20px/1 system-ui,sans-serif;cursor:pointer}
+#gate{position:fixed;inset:0;z-index:2;display:none;border:0;padding:0;cursor:pointer;
+  background:rgba(0,0,0,.55);color:#f2b431;
+  font:700 clamp(20px,4vw,38px)/1.5 system-ui,sans-serif}
 </style>
-<video src="demo.mp4" controls autoplay playsinline></video>
-<button id="snd">🔊 소리 켜기</button>
+<video src="demo.mp4" controls playsinline></video>
+<button id="gate">🔊 소리 켜고 재생</button>
 <script>
 const v = document.querySelector("video");
-const b = document.getElementById("snd");
-// 음소거 자동재생은 브라우저가 허용하고, 소리 있는 자동재생은 막는다.
-// 막혔을 때 음소거로 떨어뜨리고 끝내면 영상은 끝까지 무음으로 돈다. 다시 켤 손잡이를 남긴다.
-const on = () => {
+const gate = document.getElementById("gate");
+// 버튼을 화면 안에 작게 놓으면 그 클릭이 video 위로 새고, controls가 그것을 일시정지로 받는다.
+// 덮개를 화면 전체로 깔아 클릭을 하나만 받는다.
+const play = () => {
+  gate.style.display = "none";
   v.muted = false;
   v.volume = 1;
-  b.style.display = "none";
-  v.play().catch(() => {});
-  document.removeEventListener("pointerdown", on);
-  document.removeEventListener("keydown", on);
+  v.play().catch(() => { gate.style.display = "block"; });
 };
-v.play().catch(() => {
-  v.muted = true;
-  v.play().catch(() => {});
-  b.style.display = "block";
-  document.addEventListener("pointerdown", on);
-  document.addEventListener("keydown", on);
-});
-b.addEventListener("click", on);
+gate.addEventListener("click", play);
+v.play().then(play).catch(() => { gate.style.display = "block"; });
 </script>
 </html>
